@@ -1,0 +1,23 @@
+stages:
+  - test
+
+variables:
+  POSTGRES_DB: book-store
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: password
+  POSTGRES_HOST: postgres
+
+services:
+  - name: postgres:latest
+    alias: postgres
+
+before_script:
+  - apt-get update -qy
+  - apt-get install -y nodejs npm
+  - npm install
+
+test:
+  stage: test
+  script:
+    - npm run build
+    - npm run test:e2e
