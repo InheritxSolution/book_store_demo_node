@@ -28,7 +28,8 @@ import {HttpExceptionFilter} from './common/exceptions/http.exception';
     }),
     BooksModule],
   controllers: [AppController],
-  providers: [AppService, 
+  providers: [
+    AppService, 
     { 
       provide: APP_FILTER, 
       useClass: HttpExceptionFilter, 
