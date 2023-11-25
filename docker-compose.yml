@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  api:
+    container_name: api
+    restart: always
+    build: .
+    ports:
+      - '4000:3000'
+    environment:
+      - DB_URL=postgres://postgres:password@postgres:5432/book-store
+      - PORT=3000
+    depends_on:
+      - db
+    volumes:
+    - .:/usr/src/app
+
+  db:
+    container_name: postgres
+    image: postgres
+    ports:
+      - '5431:5432'
+    volumes:
+      - data:/data/db
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=book-store
+      - POSTGRES_USER=postgres
+
+volumes: 
+ data: {}
