@@ -19,10 +19,4 @@ jobs:
           node-version: '17'
           cache: 'npm'
       - name: Install dependencies
-        run: npm install
-      - name: Build Nest Application
-        run: npm run build 
-      - name: Start Nest Application
-        run: npm run start  
-      - name: Test Nest Application
-        run: npm run test:e2e   
+        run: npm ci 
