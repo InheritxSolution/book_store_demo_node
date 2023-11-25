@@ -20,5 +20,4 @@ test:
   stage: test
   script:
     - npm run build
-    - npm run start
     - npm run test:e2e
