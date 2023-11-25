@@ -106,7 +106,6 @@ describe('BookController (e2e)', () => {
         .set('Accept', 'application/json')
         .send(book)
         .expect((response: any) => {
-          console.log(response.body)
           expect(response.body.message[0]).toEqual(
             'bookName should not be empty',
           );
@@ -162,8 +161,6 @@ describe('BookController (e2e)', () => {
         .get('/books')
         .send()
         .expect((response: any) => {
-          console.log(response.body.data)
-
           expect(response.body.data.length).toEqual(1);
           expect(response.body.data[0].status).toEqual(1);
         })
