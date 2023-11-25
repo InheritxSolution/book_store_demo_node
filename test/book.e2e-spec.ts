@@ -1,13 +1,34 @@
-import { HttpStatus } from '@nestjs/common';
-import { Messages } from '../src/common/constant/message';
-
+import { HttpStatus, ValidationPipe } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-
+import { AppModule } from '../src/app.module';
 import { CreateBookDto } from '../src/modules/books/dto/create-book.dto';
 import { recordStatus } from '../src/common/enums/crud.enum';
+import { Messages } from '../src/common/constant/message';
+import {HttpExceptionFilter} from '../src/common/exceptions/http.exception';
+
+
 
 describe('BookController (e2e)', () => {
-  const authUrl = `http://localhost:3000/books`;
+  let authUrl = 'http://localhost:3000'
+
+  let app: INestApplication;
+
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    app.useGlobalFilters(new HttpExceptionFilter());
+
+    // For validation
+    app.useGlobalPipes(new ValidationPipe());
+    await app.init();
+
+    authUrl = app.getHttpServer()
+  });
 
   const mockBook: CreateBookDto = {
     bookName: 'Harry Potter',
@@ -26,7 +47,7 @@ describe('BookController (e2e)', () => {
   describe('/books/ [POST]', () => {
     it('it should create a book and return created book', () => {
       return request(authUrl)
-        .post('/')
+        .post('/books')
         .set('Accept', 'application/json')
         .send(mockBook)
         .expect((response: any) => {
@@ -41,11 +62,11 @@ describe('BookController (e2e)', () => {
     });
   });
 
-  // Test case : add new book with same book name that is alredy exist
+  // Test case : add new book with same book name that is already exist
   describe('/books/ [POST]', () => {
     it('it should give an error book is already exists', () => {
       return request(authUrl)
-        .post('/')
+        .post('/books')
         .set('Accept', 'application/json')
         .send(mockBook)
         .expect((response: any) => {
@@ -63,7 +84,7 @@ describe('BookController (e2e)', () => {
       let book = {...mockBook}
       book.bookName = 'New Test Book';
       return request(authUrl)
-        .post('/')
+        .post('/books')
         .set('Accept', 'application/json')
         .send(book)
         .expect((response: any) => {
@@ -81,10 +102,11 @@ describe('BookController (e2e)', () => {
       let book = { ...mockBook };
       delete book.bookName;
       return request(authUrl)
-        .post('/')
+        .post('/books')
         .set('Accept', 'application/json')
         .send(book)
         .expect((response: any) => {
+          console.log(response.body)
           expect(response.body.message[0]).toEqual(
             'bookName should not be empty',
           );
@@ -99,7 +121,7 @@ describe('BookController (e2e)', () => {
       let book = { ...mockBook };
       delete book.isbn;
       return request(authUrl)
-        .post('/')
+        .post('/books')
         .set('Accept', 'application/json')
         .send(book)
         .expect((response: any) => {
@@ -115,7 +137,7 @@ describe('BookController (e2e)', () => {
       let book = { ...mockBook };
       book.isbn = '1234456';
       return request(authUrl)
-        .post('/')
+        .post('/books')
         .set('Accept', 'application/json')
         .send(book)
         .expect((response: any) => {
@@ -137,9 +159,11 @@ describe('BookController (e2e)', () => {
   describe('/books/ [GET]', () => {
     it('it should give only one record with status 1', () => {
       return request(authUrl)
-        .get('/')
+        .get('/books')
         .send()
         .expect((response: any) => {
+          console.log(response.body.data)
+
           expect(response.body.data.length).toEqual(1);
           expect(response.body.data[0].status).toEqual(1);
         })
@@ -157,7 +181,7 @@ describe('BookController (e2e)', () => {
   describe('/books/:id [GET]', () => {
     it('it should give valid book record', () => {
       return request(authUrl)
-        .get(`/${bookId}`)
+        .get(`/books/${bookId}`)
         .send()
         .expect((response: any) => {
           expect(response.body.data.bookName).toEqual(mockBook.bookName);
@@ -171,7 +195,7 @@ describe('BookController (e2e)', () => {
   describe('/books/:id [GET]', () => {
     it('it should give, book not foud', () => {
       return request(authUrl)
-        .get(`/2fa6201c-b68f-489c-82df-f1a473a127d9`)
+        .get(`/books/2fa6201c-b68f-489c-82df-f1a473a127d9`)
         .send()
         .expect((response: any) => {
           expect(response.body.message).toEqual(
@@ -193,7 +217,7 @@ describe('BookController (e2e)', () => {
     it('it should give an error, book not found', () => {
       let book = { bookName: 'New Book', isbn: '123455' };
       return request(authUrl)
-        .put(`/2fa6201c-b68f-489c-82df-f1a473a127d9`)
+        .put(`/books/2fa6201c-b68f-489c-82df-f1a473a127d9`)
         .set('Accept', 'application/json')
         .send(book)
         .expect((response: any) => {
@@ -210,7 +234,7 @@ describe('BookController (e2e)', () => {
     it('it should return updated record', () => {
       let book = { bookName: 'New Book', isbn: '123455' };
       return request(authUrl)
-        .put(`/${bookId}`)
+        .put(`/books/${bookId}`)
         .set('Accept', 'application/json')
         .send(book)
         .expect((response: any) => {
@@ -227,7 +251,7 @@ describe('BookController (e2e)', () => {
     it('it should give an error, bookname already exist', () => {
       mockBook.isbn = '2345678901234'
       request(authUrl)
-        .put(`/${bookId}`)
+        .put(`/books/${bookId}`)
         .set('Accept', 'application/json')
         .send(mockBook)
         .expect((response: any) => {
@@ -257,7 +281,7 @@ describe('BookController (e2e)', () => {
   describe('/books/:id [DELETE]', () => {
     it('it should give an error, book not found', () => {
       return request(authUrl)
-        .delete(`/2fa6201c-b68f-489c-82df-f1a473a127d9`)
+        .delete(`/books/2fa6201c-b68f-489c-82df-f1a473a127d9`)
         .send()
         .expect((response: any) => {
           expect(response.body.message).toEqual(
@@ -272,7 +296,7 @@ describe('BookController (e2e)', () => {
   describe('/books/:id [DELETE]', () => {
     it('it should change the staus of record to deleted', () => {
       return request(authUrl)
-        .delete(`/${bookId}`)
+        .delete(`/books/${bookId}`)
         .send()
         .expect((response: any) => {
           expect(response.body.message).toEqual(
@@ -282,5 +306,9 @@ describe('BookController (e2e)', () => {
         })
         .expect(HttpStatus.OK);
     });
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 });

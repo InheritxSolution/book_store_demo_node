@@ -1,5 +1,5 @@
-import { BaseEntity } from 'src/common/entity/base.entity';
-import { recordStatus } from 'src/common/enums/crud.enum';
+import { BaseEntity } from '../../../common/entity/base.entity';
+import { recordStatus } from '../../../common/enums/crud.enum';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
