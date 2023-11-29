@@ -24,10 +24,7 @@ jobs:
           node-version: 18
 
       - name: Install Dependency
-        run:
-          - npm install
+        run: npm install
 
       - name: Test
-        run:
-          - npm run build
-          - npm run test:e2e
+        run: npm run test:e2e
