@@ -1,6 +1,7 @@
+name: E2E Testing
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   # Label of the container job
@@ -8,15 +9,27 @@ jobs:
     # Containers must run in Linux based operating systems
     runs-on: ubuntu-latest
     services:
-       - name: postgres:latest
-         alias: postgres
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: book-store
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_HOST: postgres
     steps:
-     - name: Install Dependency
-       run: 
-        - apt-get update -qy
-        - apt-get install -y nodejs npm
-        - npm install
-     - name: Test
-       run:
-       - npm run build
-       - npm run test:e2e
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependency
+        run:
+          - npm install
+          
+      - name: Test
+        run:
+          - npm run build
+          - npm run test:e2e
