@@ -13,7 +13,7 @@ jobs:
           POSTGRES_DB: book-store
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
-          POSTGRES_HOST: postgres
+          POSTGRES_HOST: localhost
         ports:
           - 5432:5432
     steps:
