@@ -7,11 +7,10 @@ jobs:
   container-job:
     # Containers must run in Linux based operating systems
     runs-on: ubuntu-latest
-    steps:
-     - name: Postgres Container
-       services:
+    services:
        - name: postgres:latest
          alias: postgres
+    steps:
      - name: Install Dependency
        run: 
         - apt-get update -qy
