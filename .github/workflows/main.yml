@@ -2,26 +2,22 @@ on:
   push:
     branches: [ master ]
 
-stages:
-  - test
-
-variables:
-  POSTGRES_DB: book-store
-  POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: password
-  POSTGRES_HOST: postgres
-
-services:
-  - name: postgres:latest
-    alias: postgres
-
-before_script:
-  - apt-get update -qy
-  - apt-get install -y nodejs npm
-  - npm install
-
-test:
-  stage: test
-  script:
-    - npm run build
-    - npm run test:e2e
+jobs:
+  # Label of the container job
+  container-job:
+    # Containers must run in Linux based operating systems
+    runs-on: ubuntu-latest
+    steps:
+     - name: Postgres Container
+       services:
+       - name: postgres:latest
+         alias: postgres
+     - name: Install Dependency
+       run: 
+        - apt-get update -qy
+        - apt-get install -y nodejs npm
+        - npm install
+     - name: Test
+       run:
+       - npm run build
+       - npm run test:e2e
