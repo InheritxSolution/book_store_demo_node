@@ -9,11 +9,12 @@ jobs:
     services:
       postgres:
         image: postgres:latest
+        alias: postgres
         env:
           POSTGRES_DB: book-store
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
-          POSTGRES_HOST: localhost
+          POSTGRES_HOST: postgres
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
