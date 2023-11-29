@@ -20,7 +20,7 @@ import {HttpExceptionFilter} from './common/exceptions/http.exception';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        url: configService.get('DB_URL'),
+        url: configService.get('DB_URL') || 'postgres://postgres:password@postgres:5432/book-store',
         entities: entities,
         synchronize: true,
       }),

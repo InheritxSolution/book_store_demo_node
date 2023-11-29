@@ -10,5 +10,7 @@
     npm run test:e2e
 ## Check Test Cases on Deploy   
     push your code to main branch and check gitlab pipeline
+## List of Apis  
+    listed all apis in postman collection json file    
 
 ## Thanks
